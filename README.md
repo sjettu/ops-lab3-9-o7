@@ -79,3 +79,9 @@ Prometheus 使用独立端口19090，避免与原Lab2的9090冲突；业务服�
 迁移方法来源：Qiyao-25/ops-lab2-9 的 main 提交
 2c133c68828c551c80ed2152dabd2691a5eb6902（2026-10-30读取的最新版本）。
 阶段2已参考其 internal/metrics/ 完成接入；不需要第二台主机。
+
+## Lab 3 O7：CPU 配额对照
+
+本仓库以 Lab 2 的 textstats 为基础。两组使用同一二进制和 CPU 1，唯一区别是 `quota` 组设置 `CPUQuota=50%`。云主机需使用 systemd 和 cgroup v2。先运行 `make build`，再以 root 运行 `deploy/start-o7-service.sh baseline` 或 `deploy/start-o7-service.sh quota`。每轮结束用 `systemctl stop lab3-o7-textstats-baseline` 或 `systemctl stop lab3-o7-textstats-quota` 停止该轮服务。
+
+输入由 `python3 scripts/make-input.py data/request.json --text-bytes 65536` 生成。两组都通过同一个 Lab 3 `lbd` 转发 POST `/api/analyze`，以 `/healthz` 检查后端，使用 `100@30s,400@30s`。同时记录服务 cgroup 的 `cpu.max` 和压测前后的 `cpu.stat`。
